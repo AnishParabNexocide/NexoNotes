@@ -6,7 +6,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 p-6 animate-fade-in-down">
         <nav className="flex justify-between items-center max-w-6xl mx-auto">
-          <div className="text-2xl font-bold text-gray-800 hover:scale-105 transition-transform duration-200 cursor-pointer">
+          <div className="text-2xl font-bold text-gray-800 hover:scale-105 transition-transform duration-200 cursor-pointer animate-pop-up">
             NexoNotes
           </div>
           <div className="space-x-4">
@@ -32,11 +32,11 @@ export default function LandingPage() {
           Welcome to{" "}
           <span className="text-blue-600 animate-pulse">NexoNotes</span>
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl animate-slide-up opacity-0 animation-delay-200">
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl animate-slide-up animation-delay-200">
           Your ultimate note-taking companion. Organize, create, and access your
           notes seamlessly across all your devices.
         </p>
-        <div className="space-x-4 animate-slide-up opacity-0 animation-delay-400">
+        <div className="space-x-4 animate-slide-up animation-delay-400">
           <Link
             href="/register"
             className="px-8 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700 hover:scale-105 hover:shadow-xl transition-all duration-300 transform"

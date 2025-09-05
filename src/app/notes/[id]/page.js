@@ -395,28 +395,35 @@ export default function NotePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <svg
-            className="animate-spin -ml-1 mr-3 h-8 w-8 text-blue-600 mx-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          <p className="text-gray-600 mt-2">Loading note...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
+          <div className="float-animation mb-6">
+            <svg
+              className="animate-spin h-12 w-12 text-blue-600 mx-auto"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Loading your note...
+          </h2>
+          <p className="text-gray-600">
+            Please wait while we fetch your content.
+          </p>
         </div>
       </div>
     );
@@ -424,18 +431,47 @@ export default function NotePage() {
 
   if (!note) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
+          <div className="mb-6">
+            <svg
+              className="mx-auto h-16 w-16 text-red-400 float-animation"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Note not found
           </h2>
-          <p className="text-gray-600 mb-4">
-            The note you're looking for doesn't exist.
+          <p className="text-gray-600 mb-6">
+            The note you&apos;re looking for doesn&apos;t exist or has been
+            deleted.
           </p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="btn-primary-enhanced inline-flex items-center micro-interaction"
           >
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
             Back to Dashboard
           </Link>
         </div>
@@ -444,15 +480,16 @@ export default function NotePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 animate-fade-in">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b animate-fade-in-down">
+      <header className="glass-effect shadow-elevation-2 border-b animate-fade-in-down sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard"
-                className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-all duration-200"
+                className="text-gray-600 hover:text-blue-600 hover:scale-110 transition-all duration-200 micro-interaction p-2 rounded-lg hover:bg-blue-50"
+                title="Back to Dashboard"
               >
                 <svg
                   className="w-6 h-6"
@@ -468,14 +505,21 @@ export default function NotePage() {
                   />
                 </svg>
               </Link>
-              <h1 className="text-xl font-semibold text-gray-900 truncate max-w-md">
-                {note.title}
-              </h1>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-green-400 rounded-full pulse-animation"></div>
+                <h1 className="text-xl font-semibold text-gradient truncate max-w-md text-shadow-soft">
+                  {note.title}
+                </h1>
+              </div>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="text-gray-600 hover:text-blue-600 hover:scale-110 transition-all duration-200"
+                className={`p-2 rounded-lg transition-all duration-200 micro-interaction ${
+                  isEditing
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                }`}
                 title="Edit note"
               >
                 <svg
@@ -494,7 +538,7 @@ export default function NotePage() {
               </button>
               <Link
                 href="/"
-                className="text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-xl font-bold text-gradient hover:scale-105 transition-all duration-300 animate-pop-up text-shadow-soft"
               >
                 NexoNotes
               </Link>
@@ -505,81 +549,180 @@ export default function NotePage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Note Metadata */}
-          <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up">
-            <div className="flex flex-wrap items-center justify-between mb-4">
-              <div className="flex flex-wrap gap-2">
-                {note.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <div className="text-sm text-gray-500 space-y-1">
-                <div>Created: {formatDate(note.createdAt)}</div>
-                <div>Updated: {formatDate(note.updatedAt)}</div>
+          <div className="gradient-border animate-slide-up">
+            <div className="gradient-border-inner">
+              <div className="flex flex-wrap items-center justify-between">
+                <div className="flex flex-wrap gap-3 mb-4 md:mb-0">
+                  {note.tags.map((tag, index) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 hover:from-blue-200 hover:to-purple-200 transition-all duration-200 micro-interaction"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-sm text-gray-500 space-y-1 bg-white/50 backdrop-blur-sm rounded-lg p-3 border border-white/30">
+                  <div className="flex items-center space-x-2">
+                    <svg
+                      className="w-4 h-4 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    <span>Created: {formatDate(note.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <svg
+                      className="w-4 h-4 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    <span>Updated: {formatDate(note.updatedAt)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Note Content */}
-          <div className="bg-white rounded-lg shadow-sm p-8 animate-slide-up animation-delay-100">
-            <div className="prose prose-lg max-w-none">
-              {renderContent(note.content)}
+          <div className="dashboard-card animate-slide-up animation-delay-100">
+            <div className="p-8">
+              <div className="prose prose-lg max-w-none">
+                <div className="text-shadow-soft">
+                  {renderContent(note.content)}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Attachments */}
           {note.attachments && note.attachments.length > 0 && (
-            <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Attachments ({note.attachments.length})
-              </h3>
-              <div className="space-y-3">
-                {note.attachments.map((attachment) => (
-                  <div
-                    key={attachment.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+            <div className="dashboard-card animate-slide-up animation-delay-200">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gradient mb-6 flex items-center space-x-2 text-shadow-soft">
+                  <svg
+                    className="w-6 h-6 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <div className="flex items-center space-x-3">
-                      {getFileIcon(attachment.type)}
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {attachment.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatFileSize(attachment.size)}
-                        </p>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                    />
+                  </svg>
+                  <span>Attachments ({note.attachments.length})</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {note.attachments.map((attachment, index) => (
+                    <div
+                      key={attachment.id}
+                      className="glass-effect rounded-xl p-4 hover:shadow-elevation-2 transition-all duration-300 micro-interaction group"
+                      style={{ animationDelay: `${index * 100 + 300}ms` }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <div className="flex-shrink-0">
+                            {getFileIcon(attachment.type)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                              {attachment.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatFileSize(attachment.size)}
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={attachment.url}
+                          className="flex-shrink-0 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 micro-interaction"
+                          title="Download file"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                        </a>
                       </div>
                     </div>
-                    <a
-                      href={attachment.url}
-                      className="text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-200"
-                      title="Download file"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </a>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
+        </div>
+
+        {/* Floating Action Buttons */}
+        <div className="fixed bottom-8 right-8 flex flex-col space-y-4 z-40">
+          <Link
+            href="/notes/create"
+            className="btn-primary-enhanced w-14 h-14 rounded-full flex items-center justify-center shadow-elevation-4 hover:shadow-elevation-4 float-animation"
+            title="Create new note"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </Link>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="w-12 h-12 bg-white/80 backdrop-blur-sm text-gray-600 hover:text-blue-600 rounded-full flex items-center justify-center shadow-elevation-2 hover:shadow-elevation-3 transition-all duration-300 micro-interaction border border-white/30"
+            title="Scroll to top"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+          </button>
         </div>
       </main>
     </div>

@@ -8,20 +8,20 @@ export default function LoginPage() {
         <div className="text-center animate-fade-in-down">
           <Link
             href="/"
-            className="text-2xl font-bold text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-200"
+            className="text-2xl font-bold text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-200 animate-pop-in animation-delay-200 inline-block"
           >
             NexoNotes
           </Link>
-          <h2 className="mt-4 text-2xl font-bold text-gray-800 animate-bounce-in">
+          <h2 className="mt-4 text-2xl font-bold text-gray-800 animate-slide-up animation-delay-400">
             Welcome Back
           </h2>
-          <p className="mt-2 text-sm text-gray-600 opacity-0 animate-fade-in animation-delay-200">
+          <p className="mt-2 text-sm text-gray-600 animate-fade-in animation-delay-600">
             Sign in to your account to continue
           </p>
         </div>
 
         {/* Login Form */}
-        <form className="space-y-4 animate-slide-up opacity-0 animation-delay-300">
+        <form className="space-y-4 animate-slide-up animation-delay-300">
           <div className="group">
             <label
               htmlFor="email"
@@ -34,7 +34,7 @@ export default function LoginPage() {
               id="email"
               name="email"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Enter your email"
             />
           </div>
@@ -51,7 +51,7 @@ export default function LoginPage() {
               id="password"
               name="password"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Enter your password"
             />
           </div>
@@ -87,9 +87,9 @@ export default function LoginPage() {
         </form>
 
         {/* Sign up link */}
-        <div className="text-center animate-fade-in opacity-0 animation-delay-500">
+        <div className="text-center animate-fade-in animation-delay-500">
           <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-all duration-200"

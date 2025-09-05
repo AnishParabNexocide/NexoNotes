@@ -8,24 +8,24 @@ export default function RegisterPage() {
         <div className="text-center animate-fade-in-down">
           <Link
             href="/"
-            className="text-2xl font-bold text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-200"
+            className="text-2xl font-bold text-blue-600 hover:text-blue-800 hover:scale-110 transition-all duration-200 animate-pop-in animation-delay-200 inline-block"
           >
             NexoNotes
           </Link>
-          <h2 className="mt-4 text-2xl font-bold text-gray-800 animate-bounce-in">
+          <h2 className="mt-4 text-2xl font-bold text-gray-800 animate-slide-up animation-delay-400">
             Create Account
           </h2>
-          <p className="mt-2 text-sm text-gray-600 opacity-0 animate-fade-in animation-delay-200">
+          <p className="mt-2 text-sm text-gray-600 animate-fade-in animation-delay-600">
             Join NexoNotes and start organizing your notes
           </p>
         </div>
 
         {/* Registration Form */}
-        <form className="space-y-4 animate-slide-up opacity-0 animation-delay-300">
+        <form className="space-y-4 animate-slide-up animation-delay-300">
           <div className="group">
             <label
               htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700 group-focus-within:text-blue-600 transition-colors"
+              className="block text-sm font-medium text-black group-focus-within:text-blue-600 transition-colors"
             >
               Full Name
             </label>
@@ -34,7 +34,7 @@ export default function RegisterPage() {
               id="fullName"
               name="fullName"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Enter your full name"
             />
           </div>
@@ -42,7 +42,7 @@ export default function RegisterPage() {
           <div className="group">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 group-focus-within:text-blue-600 transition-colors"
+              className="block text-sm font-medium text-black group-focus-within:text-blue-600 transition-colors"
             >
               Email Address
             </label>
@@ -51,7 +51,7 @@ export default function RegisterPage() {
               id="email"
               name="email"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Enter your email"
             />
           </div>
@@ -68,7 +68,7 @@ export default function RegisterPage() {
               id="password"
               name="password"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Create a password"
             />
           </div>
@@ -85,7 +85,7 @@ export default function RegisterPage() {
               id="confirmPassword"
               name="confirmPassword"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-all duration-200 placeholder-black"
               placeholder="Confirm your password"
             />
           </div>
@@ -119,7 +119,7 @@ export default function RegisterPage() {
         </form>
 
         {/* Sign in link */}
-        <div className="text-center animate-fade-in opacity-0 animation-delay-500">
+        <div className="text-center animate-fade-in animation-delay-500">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
             <Link

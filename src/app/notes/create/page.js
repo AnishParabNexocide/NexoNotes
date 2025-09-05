@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CreateNote() {
   const router = useRouter();
   const fileInputRef = useRef(null);
+  const contentRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -17,6 +18,151 @@ export default function CreateNote() {
   const [attachments, setAttachments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+  });
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
+
+  // Color options for text and highlighting
+  const textColors = [
+    { name: "Black", value: "#000000" },
+    { name: "Dark Gray", value: "#374151" },
+    { name: "Gray", value: "#6B7280" },
+    { name: "Red", value: "#EF4444" },
+    { name: "Orange", value: "#F97316" },
+    { name: "Yellow", value: "#EAB308" },
+    { name: "Green", value: "#22C55E" },
+    { name: "Blue", value: "#3B82F6" },
+    { name: "Indigo", value: "#6366F1" },
+    { name: "Purple", value: "#A855F7" },
+    { name: "Pink", value: "#EC4899" },
+    { name: "Teal", value: "#14B8A6" },
+  ];
+
+  const highlightColors = [
+    { name: "None", value: "transparent" },
+    { name: "Yellow", value: "#FEF08A" },
+    { name: "Green", value: "#BBF7D0" },
+    { name: "Blue", value: "#BFDBFE" },
+    { name: "Purple", value: "#DDD6FE" },
+    { name: "Pink", value: "#FBCFE8" },
+    { name: "Orange", value: "#FED7AA" },
+    { name: "Red", value: "#FECACA" },
+    { name: "Gray", value: "#E5E7EB" },
+  ];
+
+  // Rich text editor functions
+  const formatText = (command, value = null) => {
+    // Ensure the content div has focus for commands to work
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
+    
+    // Execute the formatting command
+    const success = document.execCommand(command, false, value);
+    
+    // Special handling for list commands to ensure they work properly
+    if ((command === 'insertUnorderedList' || command === 'insertOrderedList') && contentRef.current) {
+      // If no text is selected and cursor is at the beginning, add some content first
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (range.collapsed && contentRef.current.innerHTML.trim() === '') {
+          contentRef.current.innerHTML = '<div><br></div>';
+          // Place cursor in the div
+          range.setStart(contentRef.current.firstChild, 0);
+          range.setEnd(contentRef.current.firstChild, 0);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          // Execute command again
+          document.execCommand(command, false, value);
+        }
+      }
+    }
+    
+    updateActiveFormats();
+    
+    // Update form data with the new content
+    if (contentRef.current) {
+      setFormData((prev) => ({
+        ...prev,
+        content: contentRef.current.innerHTML,
+      }));
+    }
+    
+    return success;
+  };
+
+  const updateActiveFormats = () => {
+    setActiveFormats({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+    });
+  };
+
+  const handleContentChange = () => {
+    if (contentRef.current) {
+      setFormData((prev) => ({
+        ...prev,
+        content: contentRef.current.innerHTML,
+      }));
+    }
+    updateActiveFormats();
+  };
+
+  const handleKeyDown = (e) => {
+    // Handle keyboard shortcuts
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case "b":
+          e.preventDefault();
+          formatText("bold");
+          break;
+        case "i":
+          e.preventDefault();
+          formatText("italic");
+          break;
+        case "u":
+          e.preventDefault();
+          formatText("underline");
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  const handleKeyUp = (e) => {
+    updateActiveFormats();
+  };
+
+  const handleMouseUp = () => {
+    updateActiveFormats();
+  };
+
+  useEffect(() => {
+    // Set initial content
+    if (contentRef.current && !formData.content) {
+      contentRef.current.innerHTML = "";
+    }
+
+    // Close color pickers when clicking outside
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".color-picker-container")) {
+        setShowColorPicker(false);
+        setShowHighlightPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [formData.content]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -131,6 +277,11 @@ export default function CreateNote() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Ensure we have the latest content from the editor
+    const finalContent = contentRef.current
+      ? contentRef.current.innerHTML
+      : formData.content;
+
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -142,6 +293,7 @@ export default function CreateNote() {
 
       console.log("Note data:", {
         ...formData,
+        content: finalContent, // Use the HTML content from the editor
         tags: formData.tags
           .split(",")
           .map((tag) => tag.trim())
@@ -193,7 +345,7 @@ export default function CreateNote() {
             </div>
             <Link
               href="/"
-              className="text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors"
+              className="text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors animate-pop-up"
             >
               NexoNotes
             </Link>
@@ -220,7 +372,7 @@ export default function CreateNote() {
               value={formData.title}
               onChange={handleInputChange}
               placeholder="Enter a descriptive title for your note..."
-              className="w-full px-3 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-3 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-black"
             />
           </div>
 
@@ -228,19 +380,313 @@ export default function CreateNote() {
           <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-100">
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-4"
             >
               Note Content
             </label>
-            <textarea
-              id="content"
-              name="content"
-              required
-              rows={12}
-              value={formData.content}
-              onChange={handleInputChange}
-              placeholder="Start writing your note content here..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+
+            {/* Rich Text Editor Toolbar */}
+            <div className="border border-gray-300 rounded-t-md bg-gray-50 px-4 py-2 flex flex-wrap items-center gap-2">
+              {/* Bold */}
+              <button
+                type="button"
+                onClick={() => formatText("bold")}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  activeFormats.bold
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border"
+                }`}
+                title="Bold (Ctrl+B)"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M5 3h6a3 3 0 013 3v2a3 3 0 01-1.5 2.598A3 3 0 0114 13v2a3 3 0 01-3 3H5V3zm3 8V6h3a1 1 0 010 2H8zm0 5v-3h3.5a1 1 0 010 2H8z" />
+                </svg>
+              </button>
+
+              {/* Italic */}
+              <button
+                type="button"
+                onClick={() => formatText("italic")}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  activeFormats.italic
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border"
+                }`}
+                title="Italic (Ctrl+I)"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 3v1H8l2 12h2v1H6v-1h2L6 4H4V3h6z" />
+                </svg>
+              </button>
+
+              {/* Underline */}
+              <button
+                type="button"
+                onClick={() => formatText("underline")}
+                className={`p-2 rounded-md transition-all duration-200 ${
+                  activeFormats.underline
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border"
+                }`}
+                title="Underline (Ctrl+U)"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M5 3v8a5 5 0 0010 0V3h-2v8a3 3 0 01-6 0V3H5zm0 14h10v2H5v-2z" />
+                </svg>
+              </button>
+
+              <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+              {/* Font Size */}
+              <select
+                onChange={(e) => formatText("fontSize", e.target.value)}
+                className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-black"
+                title="Font Size"
+                defaultValue="3"
+              >
+                <option value="1">Small</option>
+                <option value="3">Normal</option>
+                <option value="4">Medium</option>
+                <option value="5">Large</option>
+                <option value="6">X-Large</option>
+                <option value="7">XX-Large</option>
+              </select>
+
+              <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+              {/* Text Color Picker */}
+              <div className="relative color-picker-container">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowColorPicker(!showColorPicker);
+                    setShowHighlightPicker(false);
+                  }}
+                  className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 border transition-all duration-200 flex items-center"
+                  title="Text Color"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                  <svg
+                    className="w-3 h-3 ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+
+                {/* Color Picker Dropdown */}
+                {showColorPicker && (
+                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 w-48">
+                    <div className="text-xs font-medium text-gray-700 mb-2">
+                      Text Colors
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {textColors.map((color) => (
+                        <button
+                          key={color.value}
+                          type="button"
+                          onClick={() => {
+                            formatText("foreColor", color.value);
+                            setShowColorPicker(false);
+                          }}
+                          className="w-8 h-8 rounded-md border-2 border-gray-200 hover:border-gray-400 transition-all duration-200 flex items-center justify-center group"
+                          style={{ backgroundColor: color.value }}
+                          title={color.name}
+                        >
+                          {color.value === "#000000" && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Highlight Color Picker */}
+              <div className="relative color-picker-container">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHighlightPicker(!showHighlightPicker);
+                    setShowColorPicker(false);
+                  }}
+                  className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 border transition-all duration-200 flex items-center"
+                  title="Highlight Color"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v11H4V4z"
+                      clipRule="evenodd"
+                    />
+                    <path d="M6 6h8v2H6V6zm0 4h8v2H6v-2z" />
+                  </svg>
+                  <svg
+                    className="w-3 h-3 ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+
+                {/* Highlight Color Picker Dropdown */}
+                {showHighlightPicker && (
+                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 w-48">
+                    <div className="text-xs font-medium text-gray-700 mb-2">
+                      Highlight Colors
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {highlightColors.map((color) => (
+                        <button
+                          key={color.value}
+                          type="button"
+                          onClick={() => {
+                            formatText("backColor", color.value);
+                            setShowHighlightPicker(false);
+                          }}
+                          className="w-8 h-8 rounded-md border-2 border-gray-200 hover:border-gray-400 transition-all duration-200 flex items-center justify-center group relative"
+                          style={{ backgroundColor: color.value }}
+                          title={color.name}
+                        >
+                          {color.value === "transparent" && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-6 h-0.5 bg-red-500 transform rotate-45"></div>
+                              <div className="w-6 h-0.5 bg-red-500 transform -rotate-45 absolute"></div>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+              {/* Lists */}
+              <button
+                type="button"
+                onClick={() => formatText("insertUnorderedList")}
+                className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 border transition-all duration-200"
+                title="Bullet List"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <circle cx="10" cy="5" r="2" />
+                  <circle cx="10" cy="10" r="2" />
+                  <circle cx="10" cy="15" r="2" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => formatText("insertOrderedList")}
+                className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 border transition-all duration-200"
+                title="Numbered List"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  {/* Simple digit 1 */}
+                  <rect x="8" y="2" width="2" height="6" />
+                  <rect x="7" y="2" width="2" height="1" />
+                  <rect x="6" y="7" width="6" height="1" />
+
+                  {/* Simple digit 2 */}
+                  <rect x="4" y="11" width="8" height="1" />
+                  <rect x="11" y="12" width="1" height="2" />
+                  <rect x="4" y="14" width="8" height="1" />
+                  <rect x="4" y="15" width="1" height="2" />
+                  <rect x="4" y="16" width="8" height="1" />
+                </svg>
+              </button>
+
+              <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+              {/* Clear Formatting */}
+              <button
+                type="button"
+                onClick={() => formatText("removeFormat")}
+                className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 border transition-all duration-200"
+                title="Clear Formatting"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Rich Text Editor Content Area */}
+            <div
+              ref={contentRef}
+              contentEditable
+              onInput={handleContentChange}
+              onKeyDown={handleKeyDown}
+              onKeyUp={handleKeyUp}
+              onMouseUp={handleMouseUp}
+              className="rich-text-editor w-full px-4 py-3 border border-gray-300 border-t-0 rounded-b-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
+              style={{
+                fontSize: "16px",
+                lineHeight: "1.6",
+                color: "#000000",
+              }}
+              data-placeholder="Start writing your note content here..."
             />
           </div>
 
@@ -259,7 +705,7 @@ export default function CreateNote() {
               value={formData.tags}
               onChange={handleInputChange}
               placeholder="work, personal, important (separate with commas)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-black"
             />
             <p className="mt-1 text-sm text-gray-500">
               Add tags to organize your notes. Separate multiple tags with
