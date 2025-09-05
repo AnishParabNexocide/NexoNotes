@@ -132,13 +132,7 @@ export default function CreateNote() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // In a real app, you would:
-      // 1. Upload attachments to storage service
-      // 2. Create note with metadata
-      // 3. Handle authentication
 
       console.log("Note data:", {
         ...formData,
@@ -153,7 +147,6 @@ export default function CreateNote() {
         })),
       });
 
-      // Redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Error creating note:", error);
@@ -165,13 +158,13 @@ export default function CreateNote() {
   return (
     <div className="min-h-screen bg-gray-50 animate-fade-in">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b animate-fade-in-down">
+      <header className="bg-white shadow-md border-b animate-fade-in-down">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform duration-200"
               >
                 <svg
                   className="w-6 h-6"
@@ -187,7 +180,7 @@ export default function CreateNote() {
                   />
                 </svg>
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 tracking-wide">
                 Create New Note
               </h1>
             </div>
@@ -205,10 +198,10 @@ export default function CreateNote() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Title */}
-          <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up">
+          <div className="bg-white rounded-xl shadow-lg p-6 animate-slide-up border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Note Title
             </label>
@@ -220,15 +213,15 @@ export default function CreateNote() {
               value={formData.title}
               onChange={handleInputChange}
               placeholder="Enter a descriptive title for your note..."
-              className="w-full px-3 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200"
             />
           </div>
 
           {/* Content */}
-          <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-100">
+          <div className="bg-white rounded-xl shadow-lg p-6 animate-slide-up animation-delay-100 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Note Content
             </label>
@@ -240,15 +233,15 @@ export default function CreateNote() {
               value={formData.content}
               onChange={handleInputChange}
               placeholder="Start writing your note content here..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200 resize-none"
             />
           </div>
 
           {/* Tags */}
-          <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-200">
+          <div className="bg-white rounded-xl shadow-lg p-6 animate-slide-up animation-delay-200 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <label
               htmlFor="tags"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-semibold text-gray-700 mb-2"
             >
               Tags (optional)
             </label>
@@ -259,7 +252,7 @@ export default function CreateNote() {
               value={formData.tags}
               onChange={handleInputChange}
               placeholder="work, personal, important (separate with commas)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200"
             />
             <p className="mt-1 text-sm text-gray-500">
               Add tags to organize your notes. Separate multiple tags with
@@ -268,8 +261,8 @@ export default function CreateNote() {
           </div>
 
           {/* File Upload */}
-          <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-300">
-            <label className="block text-sm font-medium text-gray-700 mb-4">
+          <div className="bg-white rounded-xl shadow-lg p-6 animate-slide-up animation-delay-300 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <label className="block text-sm font-semibold text-gray-700 mb-4">
               Attachments (optional)
             </label>
 
@@ -278,7 +271,7 @@ export default function CreateNote() {
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
                 dragActive
                   ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:border-gray-400"
+                  : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -310,7 +303,7 @@ export default function CreateNote() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:scale-105 transition-all duration-200"
                 >
                   Select Files
                 </button>
@@ -335,7 +328,7 @@ export default function CreateNote() {
                   {attachments.map((attachment) => (
                     <div
                       key={attachment.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
                         {getFileIcon(attachment.type)}
@@ -378,7 +371,7 @@ export default function CreateNote() {
           <div className="flex justify-end space-x-4 animate-slide-up animation-delay-400">
             <Link
               href="/dashboard"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200"
             >
               Cancel
             </Link>
@@ -389,7 +382,7 @@ export default function CreateNote() {
                 !formData.title.trim() ||
                 !formData.content.trim()
               }
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 flex items-center space-x-2"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 flex items-center space-x-2"
             >
               {isSubmitting ? (
                 <>

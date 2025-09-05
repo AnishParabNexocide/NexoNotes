@@ -3,14 +3,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-// Mock user data - in real app, this would come from authentication context
 const mockUser = {
   name: "User",
   email: "user@example.com",
   avatar: "U",
 };
 
-// Mock notes data - in real app, this would come from API
 const mockNotes = [
   {
     id: "1",
@@ -58,14 +56,11 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState("updated");
 
   useEffect(() => {
-    // Simulate API call
     setNotes(mockNotes);
   }, []);
 
-  // Get all unique tags
   const allTags = [...new Set(notes.flatMap((note) => note.tags))];
 
-  // Filter and sort notes
   const filteredNotes = notes
     .filter(
       (note) =>
@@ -77,23 +72,18 @@ export default function Dashboard() {
     )
     .filter((note) => selectedTag === "" || note.tags.includes(selectedTag))
     .sort((a, b) => {
-      if (sortBy === "updated") {
-        return new Date(b.updatedAt) - new Date(a.updatedAt);
-      } else if (sortBy === "created") {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      } else if (sortBy === "title") {
-        return a.title.localeCompare(b.title);
-      }
+      if (sortBy === "updated") return new Date(b.updatedAt) - new Date(a.updatedAt);
+      if (sortBy === "created") return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "title") return a.title.localeCompare(b.title);
       return 0;
     });
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
 
   const truncateContent = (content, maxLength = 150) => {
     if (content.length <= maxLength) return content;
@@ -101,15 +91,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Background Animation */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl animate-ping"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white shadow-sm border-b animate-fade-in-down">
+      <header className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg relative z-10 animate-fade-in-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Link
                 href="/"
-                className="text-2xl font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-indigo-600 hover:via-blue-600 hover:to-purple-600 transition-all duration-500 transform hover:scale-110"
               >
                 NexoNotes
               </Link>
@@ -117,7 +114,7 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <Link
                 href="/notes/create"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white px-4 py-2 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-500 transform flex items-center space-x-2"
               >
                 <svg
                   className="w-5 h-5"
@@ -138,9 +135,7 @@ export default function Dashboard() {
                 <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">
                   {mockUser.avatar}
                 </div>
-                <span className="text-gray-700 font-medium">
-                  {mockUser.name}
-                </span>
+                <span className="text-slate-800 font-medium">{mockUser.name}</span>
               </div>
             </div>
           </div>
@@ -148,51 +143,41 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8 animate-slide-up">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-8">
+        {/* Welcome */}
+        <div className="animate-slide-up">
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">
             Welcome back, {mockUser.name}!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-slate-600">
             You have {notes.length} notes in your collection.
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white p-6 rounded-lg shadow-sm mb-8 animate-slide-up animation-delay-200">
+        {/* Search & Filters */}
+        <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-lg p-6 animate-slide-up animation-delay-200">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
             <div>
-              <label
-                htmlFor="search"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Search Notes
               </label>
               <input
                 type="text"
-                id="search"
                 placeholder="Search by title, content, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 border border-slate-300 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white/90 backdrop-blur-sm placeholder-slate-400 text-slate-800 font-medium transition-all duration-300"
               />
             </div>
 
-            {/* Tag Filter */}
             <div>
-              <label
-                htmlFor="tag-filter"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Filter by Tag
               </label>
               <select
-                id="tag-filter"
                 value={selectedTag}
                 onChange={(e) => setSelectedTag(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 border border-slate-300 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300"
               >
                 <option value="">All Tags</option>
                 {allTags.map((tag) => (
@@ -203,19 +188,14 @@ export default function Dashboard() {
               </select>
             </div>
 
-            {/* Sort */}
             <div>
-              <label
-                htmlFor="sort"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Sort By
               </label>
               <select
-                id="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full px-3 py-2 border border-slate-300 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white/90 backdrop-blur-sm text-slate-800 font-medium transition-all duration-300"
               >
                 <option value="updated">Last Updated</option>
                 <option value="created">Date Created</option>
@@ -241,10 +221,10 @@ export default function Dashboard() {
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
+            <h3 className="mt-2 text-sm font-medium text-slate-900">
               No notes found
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-slate-600">
               {searchTerm || selectedTag
                 ? "Try adjusting your search or filters."
                 : "Get started by creating your first note."}
@@ -252,7 +232,7 @@ export default function Dashboard() {
             <div className="mt-6">
               <Link
                 href="/notes/create"
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all duration-200"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-500 transform"
               >
                 <svg
                   className="w-5 h-5 mr-2"
@@ -277,12 +257,12 @@ export default function Dashboard() {
               <Link
                 key={note.id}
                 href={`/notes/${note.id}`}
-                className="bg-white rounded-lg shadow-sm border hover:shadow-lg hover:scale-105 transition-all duration-300 transform animate-fade-in"
+                className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-500 transform animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <h3 className="text-lg font-semibold text-slate-800 truncate">
                       {note.title}
                     </h3>
                     {note.hasAttachment && (
@@ -302,7 +282,7 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-3">
                     {truncateContent(note.content)}
                   </p>
 
@@ -322,7 +302,7 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <div className="flex justify-between items-center text-xs text-gray-500">
+                  <div className="flex justify-between items-center text-xs text-slate-500">
                     <span>Updated {formatDate(note.updatedAt)}</span>
                     <span>Created {formatDate(note.createdAt)}</span>
                   </div>
