@@ -1,0 +1,19 @@
+# Firestore Security Rules
+# Copy and paste these rules in your Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /notes/{noteId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
+
+# Instructions:
+# 1. Go to https://console.firebase.google.com/project/nexo-notes
+# 2. Click on "Firestore Database" in the left sidebar
+# 3. Click on "Rules" tab
+# 4. Replace the existing rules with the rules above
+# 5. Click "Publish"

@@ -3,222 +3,62 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-
-// Mock note data - in real app, this would come from API
-const mockNotes = {
-  1: {
-    id: "1",
-    title: "Meeting Notes - Q4 Planning",
-    content: `# Q4 Planning Meeting
-
-## Attendees
-- User (Product Manager)
-- Jane Smith (Engineering Lead)
-- Mike Johnson (Designer)
-- Sarah Wilson (Marketing)
-
-## Agenda
-1. Review Q3 performance
-2. Set Q4 objectives
-3. Resource allocation
-4. Timeline discussion
-
-## Key Points Discussed
-
-### Q3 Performance Review
-- Successfully launched 3 major features
-- User engagement increased by 25%
-- Technical debt reduced by 40%
-- Customer satisfaction score: 4.2/5
-
-### Q4 Objectives
-1. **Product Goals**
-   - Launch mobile app
-   - Implement advanced search functionality
-   - Add collaboration features
-   
-2. **Technical Goals**
-   - Migrate to microservices architecture
-   - Improve API performance by 30%
-   - Implement automated testing pipeline
-
-3. **Business Goals**
-   - Increase user base by 50%
-   - Achieve 95% uptime
-   - Launch in 2 new markets
-
-## Action Items
-- [ ] Create detailed project timeline (Due: Aug 25)
-- [ ] Allocate development resources (Due: Aug 27)
-- [ ] Begin market research for new regions (Due: Sep 1)
-- [ ] Design mobile app mockups (Due: Sep 5)
-
-## Next Meeting
-**Date:** September 1st, 2024  
-**Time:** 2:00 PM EST  
-**Location:** Conference Room A / Zoom`,
-    tags: ["work", "planning", "q4", "meeting"],
-    createdAt: "2024-08-20T10:30:00Z",
-    updatedAt: "2024-08-20T15:45:00Z",
-    attachments: [
-      {
-        id: "att-1",
-        name: "Q3_Performance_Report.pdf",
-        size: 2485760,
-        type: "application/pdf",
-        url: "#",
-      },
-      {
-        id: "att-2",
-        name: "Market_Research_Data.xlsx",
-        size: 1024000,
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        url: "#",
-      },
-    ],
-  },
-  2: {
-    id: "2",
-    title: "Personal Todo List",
-    content: `# Personal Todo List
-
-## Today's Priority Tasks
-1. **Buy groceries**
-   - Milk
-   - Bread
-   - Eggs
-   - Fruits (apples, bananas)
-   - Vegetables (carrots, spinach)
-
-2. **Call dentist**
-   - Schedule routine cleaning
-   - Ask about whitening options
-   - Confirm insurance coverage
-
-3. **Finish project proposal**
-   - Review requirements
-   - Add budget section
-   - Include timeline
-   - Proofread and format
-
-## This Week
-- [ ] Car maintenance appointment
-- [ ] Update resume
-- [ ] Plan weekend trip
-- [ ] Organize home office
-- [ ] Read 2 chapters of current book
-
-## Monthly Goals
-- Exercise 3x per week
-- Save $500
-- Learn a new skill online
-- Deep clean the house
-- Plan vacation for next quarter`,
-    tags: ["personal", "todo", "goals"],
-    createdAt: "2024-08-19T09:15:00Z",
-    updatedAt: "2024-08-21T14:22:00Z",
-    attachments: [],
-  },
-  3: {
-    id: "3",
-    title: "Book Summary: Atomic Habits",
-    content: `# Atomic Habits by James Clear
-
-## Key Takeaways
-
-### The Four Laws of Behavior Change
-
-1. **Make it Obvious**
-   - Design your environment for success
-   - Use implementation intentions ("I will do X at time Y in location Z")
-   - Stack habits ("After I do X, I will do Y")
-
-2. **Make it Attractive**
-   - Bundle habits with activities you enjoy
-   - Join a culture where your desired behavior is normal
-   - Use temptation bundling
-
-3. **Make it Easy**
-   - Reduce friction for good habits
-   - Increase friction for bad habits
-   - Use the Two-Minute Rule
-   - Prepare your environment for success
-
-4. **Make it Satisfying**
-   - Use immediate rewards
-   - Track your habits
-   - Never miss twice
-
-### Important Concepts
-
-**1% Better Every Day**
-> "If you can get 1 percent better each day for one year, you'll end up thirty-seven times better by the time you're done."
-
-**Identity-Based Habits**
-- Focus on who you want to become, not what you want to achieve
-- Every action is a vote for the type of person you wish to become
-
-**The Plateau of Latent Potential**
-- Habits often appear to make no difference until you cross a critical threshold
-- Success is often delayed, but not absent
-
-### Practical Applications
-1. Start with 2-minute habits
-2. Design your environment
-3. Use habit stacking
-4. Track your progress
-5. Focus on systems, not goals
-
-### Favorite Quotes
-- "You do not rise to the level of your goals; you fall to the level of your systems."
-- "Every action you take is a vote for the type of person you wish to become."
-- "The most effective way to change your habits is to focus not on what you want to achieve, but on who you wish to become."`,
-    tags: ["books", "self-improvement", "habits", "productivity"],
-    createdAt: "2024-08-18T20:10:00Z",
-    updatedAt: "2024-08-18T20:10:00Z",
-    attachments: [
-      {
-        id: "att-3",
-        name: "atomic-habits-summary.png",
-        size: 1536000,
-        type: "image/png",
-        url: "#",
-      },
-    ],
-  },
-};
+import { useAuth } from "@/contexts/AuthContext";
+import { getNote, updateNote, deleteNote } from "@/lib/firestore";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function NotePage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const [note, setNote] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate API call
     const fetchNote = async () => {
+      if (!user || !params.id) return;
+      
       setIsLoading(true);
+      setError(null);
+      
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-        const noteData = mockNotes[params.id];
+        const noteData = await getNote(params.id);
         if (noteData) {
+          // Check if user owns this note
+          if (noteData.userId !== user.uid) {
+            setError("You don't have permission to view this note.");
+            return;
+          }
           setNote(noteData);
         } else {
-          router.push("/dashboard");
+          setError("Note not found.");
         }
-      } catch (error) {
-        console.error("Error fetching note:", error);
-        router.push("/dashboard");
+      } catch (err) {
+        console.error("Error fetching note:", err);
+        setError("Failed to load note. Please try again.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (params.id) {
-      fetchNote();
+    fetchNote();
+  }, [params.id, user]);
+
+  const handleDelete = async () => {
+    if (!note || !window.confirm("Are you sure you want to delete this note? This action cannot be undone.")) {
+      return;
     }
-  }, [params.id, router]);
+
+    try {
+      await deleteNote(note.id);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      setError("Failed to delete note. Please try again.");
+    }
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -395,92 +235,96 @@ export default function NotePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
-          <div className="float-animation mb-6">
-            <svg
-              className="animate-spin h-12 w-12 text-blue-600 mx-auto"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
+            <div className="float-animation mb-6">
+              <svg
+                className="animate-spin h-12 w-12 text-blue-600 mx-auto"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Loading your note...
+            </h2>
+            <p className="text-gray-600">
+              Please wait while we fetch your content.
+            </p>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Loading your note...
-          </h2>
-          <p className="text-gray-600">
-            Please wait while we fetch your content.
-          </p>
         </div>
-      </div>
+      </ProtectedRoute>
     );
   }
 
-  if (!note) {
+  if (error || !note) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
-          <div className="mb-6">
-            <svg
-              className="mx-auto h-16 w-16 text-red-400 float-animation"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="text-center glass-effect rounded-2xl p-12 max-w-md mx-auto shadow-elevation-3">
+            <div className="mb-6">
+              <svg
+                className="mx-auto h-16 w-16 text-red-400 float-animation"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              {error || "Note not found"}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {error || "The note you're looking for doesn't exist or has been deleted."}
+            </p>
+            <Link
+              href="/dashboard"
+              className="btn-primary-enhanced inline-flex items-center micro-interaction"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Dashboard
+            </Link>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Note not found
-          </h2>
-          <p className="text-gray-600 mb-6">
-            The note you&apos;re looking for doesn&apos;t exist or has been
-            deleted.
-          </p>
-          <Link
-            href="/dashboard"
-            className="btn-primary-enhanced inline-flex items-center micro-interaction"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Dashboard
-          </Link>
         </div>
-      </div>
+      </ProtectedRoute>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 animate-fade-in">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 animate-fade-in">
       {/* Header */}
       <header className="glass-effect shadow-elevation-2 border-b animate-fade-in-down sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -533,6 +377,25 @@ export default function NotePage() {
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={handleDelete}
+                className="p-2 rounded-lg transition-all duration-200 micro-interaction text-gray-600 hover:text-red-600 hover:bg-red-50"
+                title="Delete note"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
               </button>
@@ -615,7 +478,7 @@ export default function NotePage() {
           </div>
 
           {/* Attachments */}
-          {note.attachments && note.attachments.length > 0 && (
+          {note.attachments && note.attachments.length > 0 ? (
             <div className="dashboard-card animate-slide-up animation-delay-200">
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gradient mb-6 flex items-center space-x-2 text-shadow-soft">
@@ -680,6 +543,18 @@ export default function NotePage() {
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="dashboard-card animate-slide-up animation-delay-200">
+              <div className="p-6">
+                <div className="text-center text-gray-500">
+                  <svg className="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  <p className="text-sm">No attachments</p>
+                  <p className="text-xs text-gray-400 mt-1">File uploads are currently disabled</p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
@@ -725,6 +600,7 @@ export default function NotePage() {
           </button>
         </div>
       </main>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

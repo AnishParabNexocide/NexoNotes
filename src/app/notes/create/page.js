@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { createNote } from "@/lib/firestore";
+import { uploadMultipleFiles } from "@/lib/storage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function CreateNote() {
   const router = useRouter();
+  const { user } = useAuth();
   const fileInputRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -283,39 +288,45 @@ export default function CreateNote() {
       : formData.content;
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Process tags
+      const processedTags = formData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag);
 
-      // In a real app, you would:
-      // 1. Upload attachments to storage service
-      // 2. Create note with metadata
-      // 3. Handle authentication
+      // Note: File uploads disabled due to Storage not being enabled
+      // You can enable this later by setting up Firebase Storage
+      let uploadedAttachments = [];
+      // if (attachments.length > 0) {
+      //   const files = attachments.map(att => att.file);
+      //   uploadedAttachments = await uploadMultipleFiles(files, user.uid, "temp");
+      // }
 
-      console.log("Note data:", {
-        ...formData,
-        content: finalContent, // Use the HTML content from the editor
-        tags: formData.tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag),
-        attachments: attachments.map((att) => ({
-          name: att.name,
-          size: att.size,
-          type: att.type,
-        })),
-      });
+      // Create note data
+      const noteData = {
+        title: formData.title,
+        content: finalContent,
+        tags: processedTags,
+        attachments: uploadedAttachments,
+      };
+
+      // Create note in Firestore
+      const noteId = await createNote(noteData, user.uid);
+      console.log("Note created with ID:", noteId);
 
       // Redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Error creating note:", error);
+      // You could add error state handling here
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 animate-fade-in">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 animate-fade-in">
       {/* Header */}
       <header className="bg-white shadow-sm border-b animate-fade-in-down">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -713,23 +724,34 @@ export default function CreateNote() {
             </p>
           </div>
 
-          {/* File Upload */}
+          {/* File Upload - Temporarily Disabled */}
           <div className="bg-white rounded-lg shadow-sm p-6 animate-slide-up animation-delay-300">
             <label className="block text-sm font-medium text-gray-700 mb-4">
-              Attachments (optional)
+              Attachments (temporarily disabled)
             </label>
+            
+            {/* Info message about disabled file uploads */}
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-blue-800">
+                    File uploads temporarily disabled
+                  </h3>
+                  <div className="mt-2 text-sm text-blue-700">
+                    <p>File uploads are currently disabled as Firebase Storage is not enabled. You can still create and manage notes with text content and tags.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            {/* Drop Zone */}
+            {/* Drop Zone - Disabled */}
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-                dragActive
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:border-gray-400"
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
+              className="border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
             >
               <svg
                 className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -745,29 +767,19 @@ export default function CreateNote() {
                 />
               </svg>
               <div className="space-y-2">
-                <p className="text-lg font-medium text-gray-900">
-                  {dragActive
-                    ? "Drop files here"
-                    : "Drop files here, or click to select"}
+                <p className="text-lg font-medium text-gray-500">
+                  File uploads temporarily disabled
                 </p>
-                <p className="text-sm text-gray-500">
-                  Upload images, PDFs, documents, and more
+                <p className="text-sm text-gray-400">
+                  Enable Firebase Storage to upload files
                 </p>
                 <button
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+                  disabled
+                  className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-md text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed"
                 >
-                  Select Files
+                  Select Files (Disabled)
                 </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.svg"
-                />
               </div>
             </div>
 
@@ -882,6 +894,7 @@ export default function CreateNote() {
           </div>
         </form>
       </main>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -1,0 +1,22 @@
+# Firebase Configuration Template
+# Create a .env.local file in your project root with these variables:
+
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyBrtKK_izlT0_xiVidLA9zkls400QOhupo
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=nexo-notes.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=nexo-notes
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=nexo-notes.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=133337654732
+NEXT_PUBLIC_FIREBASE_APP_ID=1:133337654732:web:1029e6f96580a51bc86969
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-13FGXQBT7X
+
+# Instructions:
+# 1. Go to https://console.firebase.google.com/
+# 2. Create a new project or select existing one
+# 3. Go to Project Settings > General > Your apps
+# 4. Click "Add app" and select Web
+# 5. Copy the config values and replace the placeholders above
+# 6. Save as .env.local in your project root
+
+# Your Firebase project is already configured! 🎉
+# Project ID: nexo-notes
+# The .env.local file has been created with your actual configuration.
